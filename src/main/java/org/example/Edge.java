@@ -21,6 +21,6 @@ public class Edge {
     }
     @Override
     public String toString() {
-        return "(" + u + ", " + v + ") with weight " + weight ;
+        return "(" + u + ", " + v + ") with weight " + weight;
     }
 }

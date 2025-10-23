@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.Edge;
+
 import java.util.*;
 
 public class Graph {
@@ -8,10 +10,10 @@ public class Graph {
     public Graph() {
         adjList = new HashMap<>();
     }
-    public void addEdge(int u, int v, int weight) {
+
+    public void addEdge(int u, int v, double weight) {
         adjList.putIfAbsent(u, new ArrayList<>());
         adjList.putIfAbsent(v, new ArrayList<>());
-
         adjList.get(u).add(new Edge(u, v, weight));
         adjList.get(v).add(new Edge(v, u, weight));
     }
@@ -36,7 +38,7 @@ public class Graph {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<Integer, List<Edge>> entry : adjList.entrySet()) {
-            sb.append(entry.getKey()).append(":  ");
+            sb.append(entry.getKey()).append(": ");
             for (Edge edge : entry.getValue()) {
                 sb.append(edge.toString()).append(", ");
             }
