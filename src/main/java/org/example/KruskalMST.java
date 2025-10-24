@@ -1,8 +1,6 @@
 package org.example;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class KruskalMST {
     private final Graph graph;
@@ -10,6 +8,7 @@ public class KruskalMST {
     private int edgeCount;
     private int operationCount;
     private long startTime;
+    private long endTime;
 
     public KruskalMST(Graph graph) {
         this.graph = graph;
@@ -38,17 +37,14 @@ public class KruskalMST {
                 unionFind.union(u, v);
                 totalCost += weight;
                 edgeCount++;
+                operationCount++;
 
                 if(edgeCount == vertices.size()-1){
                     break;
                 }
             }
+            endTime = System.nanoTime();
         }
-        long endTime = System.nanoTime();
-        long duration = endTime - startTime;
-        System.out.println("Total cost: " + totalCost);
-        System.out.println("Edges count: " + edgeCount);
-        System.out.println("Execution Time (ms): " + (duration / 1000000));
     }
     public double getTotalCost() {
         return totalCost;
@@ -61,5 +57,13 @@ public class KruskalMST {
     }
     public long getExecutionTime() {
         return (System.nanoTime() - startTime) / 1000000;
+    }
+    public Map<String, Object> getExecutionData() {
+        Map<String, Object> data = new HashMap<>();
+        data.put("totalCost", totalCost);
+        data.put("edgeCount", edgeCount);
+        data.put("operationCount", operationCount);
+        data.put("executionTime", getExecutionTime());
+        return data;
     }
 }

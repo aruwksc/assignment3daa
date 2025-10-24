@@ -1,9 +1,6 @@
 package org.example;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.PriorityQueue;
-import java.util.Set;
+import java.util.*;
 
 public class PrimMST {
     private final Graph graph;
@@ -11,6 +8,7 @@ public class PrimMST {
     private int edgeCount;
     private int operationCount;
     private long startTime;
+    private long endTime;
 
     public PrimMST(Graph graph) {
         this.graph = graph;
@@ -34,7 +32,7 @@ public class PrimMST {
             int v = edge.getV();
             double weight = edge.getWeight();
 
-            if(!visited.contains(v)) {
+            if (!visited.contains(v)) {
                 visited.add(v);
                 totalCost += weight;
                 edgeCount++;
@@ -43,16 +41,12 @@ public class PrimMST {
                 operationCount++;
             }
 
-            if(visited.size() == graph.getVertices().size()) {
+            if (visited.size() == graph.getVertices().size()) {
                 break;
             }
         }
 
-        long endTime = System.nanoTime();
-        long duration = endTime - startTime;
-        System.out.println("Total cost: " + totalCost);
-        System.out.println("Edges count: " + edgeCount);
-        System.out.println("Execution Time (ms): " + (duration / 1000000));
+        endTime = System.nanoTime();
     }
 
     public double getTotalCost() {
@@ -65,6 +59,15 @@ public class PrimMST {
         return operationCount;
     }
     public long getExecutionTime() {
-        return (System.nanoTime() - startTime) / 1000000;
+        return (endTime - startTime) / 1_000_000;
+    }
+
+    public Map<String, Object> getExecutionData() {
+        Map<String, Object> data = new HashMap<>();
+        data.put("totalCost", totalCost);
+        data.put("edgeCount", edgeCount);
+        data.put("operationCount", operationCount);
+        data.put("executionTime", getExecutionTime());
+        return data;
     }
 }
