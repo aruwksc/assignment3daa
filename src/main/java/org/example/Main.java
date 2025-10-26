@@ -1,5 +1,6 @@
 package org.example;
 
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
@@ -67,8 +68,8 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        String inputPath = "src/main/java/org/example/input.json";
-        String outputPath = "src/main/java/org/example/output.json";
+        String inputPath = "src/main/java/org/example/random_graphs.json";
+        String outputPath = "output.json";
         if (args.length >= 1) inputPath = args[0];
         if (args.length >= 2) outputPath = args[1];
 
