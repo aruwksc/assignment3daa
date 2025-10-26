@@ -1,73 +1,64 @@
 package org.example;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class PrimMST {
-    private final Graph graph;
-    private double totalCost;
-    private int edgeCount;
-    private int operationCount;
-    private long startTime;
-    private long endTime;
-
-    public PrimMST(Graph graph) {
-        this.graph = graph;
-        this.totalCost = 0;
-        this.edgeCount = 0;
-        this.operationCount = 0;
+    public static class MSTResult {
+        public List<Edge> edges = new ArrayList<>();
+        public double totalWeight = 0.0;
+        public long operationsCount = 0;
+        public double executionTimeMs = 0.0;
     }
-    public void run(int startVertex) {
-        Set<Integer> visited = new HashSet<>();
-        PriorityQueue<Edge> minHeap = new PriorityQueue<>(Comparator.comparingDouble(Edge::getWeight));
 
-        visited.add(startVertex);
-        minHeap.addAll(graph.getNeighbours(startVertex));
+    public static MSTResult run(EdgeWeightedGraph G) {
+        long start = System.nanoTime();
+        MSTResult res = new MSTResult();
+        int V = G.V();
+        boolean[] marked = new boolean[V];
+        Edge[] edgeTo = new Edge[V];
+        double[] distTo = new double[V];
+        Arrays.fill(distTo, Double.POSITIVE_INFINITY);
 
-        startTime = System.nanoTime();
-        while (!minHeap.isEmpty()) {
-            Edge edge = minHeap.poll();
-            operationCount++;
+        IndexMinPQ<Double> pq = new IndexMinPQ<>(V);
 
-            int u = edge.getU();
-            int v = edge.getV();
-            double weight = edge.getWeight();
+        distTo[0] = 0.0;
+        pq.insert(0, 0.0);
+        res.operationsCount++;
 
-            if (!visited.contains(v)) {
-                visited.add(v);
-                totalCost += weight;
-                edgeCount++;
-
-                minHeap.addAll(graph.getNeighbours(v));
-                operationCount++;
-            }
-
-            if (visited.size() == graph.getVertices().size()) {
-                break;
+        while (!pq.isEmpty()) {
+            int v = pq.delMin();
+            res.operationsCount++;
+            marked[v] = true;
+            for (Edge e : G.adj(v)) {
+                int w = e.other(v);
+                if (marked[w]) continue;
+                res.operationsCount++;
+                if (e.weight() < distTo[w]) {
+                    distTo[w] = e.weight();
+                    edgeTo[w] = e;
+                    if (pq.contains(w)) {
+                        pq.changeKey(w, distTo[w]);
+                        res.operationsCount++;
+                    } else {
+                        pq.insert(w, distTo[w]);
+                        res.operationsCount++;
+                    }
+                }
             }
         }
 
-        endTime = System.nanoTime();
+        for (int v = 0; v < V; v++) {
+            if (edgeTo[v] != null) {
+                res.edges.add(edgeTo[v]);
+                res.totalWeight += edgeTo[v].weight();
+            }
+        }
+
+        long end = System.nanoTime();
+        res.executionTimeMs = (end - start) / 1_000_000.0;
+        return res;
     }
 
-    public double getTotalCost() {
-        return totalCost;
-    }
-    public int getEdgeCount() {
-        return edgeCount;
-    }
-    public int getOperationCount() {
-        return operationCount;
-    }
-    public long getExecutionTime() {
-        return (endTime - startTime) / 1_000_000;
-    }
-
-    public Map<String, Object> getExecutionData() {
-        Map<String, Object> data = new HashMap<>();
-        data.put("totalCost", totalCost);
-        data.put("edgeCount", edgeCount);
-        data.put("operationCount", operationCount);
-        data.put("executionTime", getExecutionTime());
-        return data;
-    }
 }

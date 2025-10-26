@@ -1,69 +1,43 @@
 package org.example;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class KruskalMST {
-    private final Graph graph;
-    private double totalCost;
-    private int edgeCount;
-    private int operationCount;
-    private long startTime;
-    private long endTime;
-
-    public KruskalMST(Graph graph) {
-        this.graph = graph;
-        this.totalCost = 0;
-        this.edgeCount = 0;
-        this.operationCount = 0;
+    public static class MSTResult {
+        public List<Edge> edges = new ArrayList<>();
+        public double totalWeight = 0.0;
+        public long operationsCount = 0;
+        public double executionTimeMs = 0.0;
     }
 
-    public void run() {
-        Set<Integer> vertices = graph.getVertices();
-        List<Edge> edges = graph.getEdges();
-        edges.sort(Comparator.comparingDouble(Edge::getWeight));
+    public static MSTResult run(EdgeWeightedGraph G) {
+        long start = System.nanoTime();
+        MSTResult res = new MSTResult();
 
-        UnionFind unionFind = new UnionFind(vertices);
+        List<Edge> edges = new ArrayList<>();
+        for (Edge e : G.edges()) edges.add(e);
+        Collections.sort(edges);
+        res.operationsCount += edges.size();
 
-        startTime = System.nanoTime();
+        UF uf = new UF(G.V());
 
-        for (Edge edge : edges) {
-            operationCount++;
-            int u = edge.getU();
-            int v = edge.getV();
-            double weight = edge.getWeight();
-
-
-            if(!unionFind.connected(u, v)){
-                unionFind.union(u, v);
-                totalCost += weight;
-                edgeCount++;
-                operationCount++;
-
-                if(edgeCount == vertices.size()-1){
-                    break;
-                }
+        for (Edge e : edges) {
+            int v = e.either();
+            int w = e.other(v);
+            res.operationsCount++;
+            if (uf.find(v) != uf.find(w)) {
+                uf.union(v, w);
+                res.edges.add(e);
+                res.totalWeight += e.weight();
+                res.operationsCount++;
             }
-            endTime = System.nanoTime();
+            if (res.edges.size() == G.V() - 1) break;
         }
-    }
-    public double getTotalCost() {
-        return totalCost;
-    }
-    public int getEdgeCount() {
-        return edgeCount;
-    }
-    public int getOperationCount() {
-        return operationCount;
-    }
-    public long getExecutionTime() {
-        return (System.nanoTime() - startTime) / 1000000;
-    }
-    public Map<String, Object> getExecutionData() {
-        Map<String, Object> data = new HashMap<>();
-        data.put("totalCost", totalCost);
-        data.put("edgeCount", edgeCount);
-        data.put("operationCount", operationCount);
-        data.put("executionTime", getExecutionTime());
-        return data;
+
+        long end = System.nanoTime();
+        res.executionTimeMs = (end - start) / 1_000_000.0;
+        return res;
     }
 }
